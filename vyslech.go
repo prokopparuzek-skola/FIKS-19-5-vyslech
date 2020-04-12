@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 const (
 	ODD  = false
@@ -12,8 +14,31 @@ type Word struct {
 	next map[string]Word
 }
 
+type Branch struct {
+	odd   bool
+	even  bool
+	first bool
+}
+
 func even(test int) bool {
 	return test%2 == 0
+}
+
+func parse(word Word, depth int) (out Branch) {
+	var back []Branch
+
+	for _, w := range word.next {
+		back = append(back, parse(w, depth+1))
+	}
+	for _, b := range back {
+		if b.even {
+			out.even = true
+		}
+		if b.odd {
+			out.odd = true
+		}
+	}
+	return
 }
 
 func main() {
@@ -60,11 +85,9 @@ func main() {
 		//fmt.Println(sentences)
 		if SEven && (AEven || AOdd) {
 			fmt.Println("Rassmo je vychytraly")
-		}
-		if !SEven && AOdd {
+		} else if !SEven && AOdd {
 			fmt.Println("Rassmo je vychytraly")
-		}
-		if !SEven && AEven {
+		} else if !SEven && AEven {
 			fmt.Println("Rassmo se priznal")
 		}
 	}
