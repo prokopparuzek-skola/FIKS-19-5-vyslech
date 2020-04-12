@@ -90,10 +90,10 @@ func main() {
 			s := sentences
 
 			fmt.Scan(&M)
-			if even(M) && AEven {
-				AEven = false
-			} else if !even(M) && AOdd {
+			if even(M) {
 				AOdd = false
+			} else {
+				AEven = false
 			}
 			for j := 1; j <= M; j++ {
 				fmt.Scan(&w)
@@ -112,13 +112,14 @@ func main() {
 			}
 		}
 		//fmt.Println(sentences)
-		if SEven && (AEven || AOdd) {
-			fmt.Println("Rassmo je vychytraly")
-			continue
-		} else if !SEven && AOdd {
+		//fmt.Println(SEven, AEven, AOdd)
+		if SEven && (AEven && !AOdd || AOdd && !AEven) {
 			fmt.Println("Rassmo je vychytraly")
 			continue
 		} else if !SEven && AEven {
+			fmt.Println("Rassmo je vychytraly")
+			continue
+		} else if !SEven && AOdd {
 			fmt.Println("Rassmo se priznal")
 			continue
 		}
