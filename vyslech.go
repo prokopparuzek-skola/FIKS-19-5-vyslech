@@ -15,9 +15,10 @@ type Word struct {
 }
 
 type Branch struct {
-	odd   bool
-	even  bool
-	first bool
+	odd    bool
+	even   bool
+	firstO bool
+	firstE bool
 }
 
 func even(test int) bool {
@@ -25,19 +26,46 @@ func even(test int) bool {
 }
 
 func parse(word Word, depth int) (out Branch) {
-	var back []Branch
+	//fmt.Println(word, depth)
+	var back Branch
 
-	for _, w := range word.next {
-		back = append(back, parse(w, depth+1))
-	}
-	for _, b := range back {
-		if b.even {
+	if word.end {
+		if even(depth) {
 			out.even = true
-		}
-		if b.odd {
+			if len(word.next) == 0 {
+				out.firstE = true
+			}
+		} else {
 			out.odd = true
+			if len(word.next) == 0 {
+				out.firstO = true
+			}
 		}
 	}
+	depth++
+	for _, w := range word.next {
+		back = parse(w, depth)
+		out.even = out.even || back.even
+		out.odd = out.odd || back.odd
+		if len(word.next) > 1 || word.end {
+			if !even(depth) {
+				out.firstE = out.firstE || back.firstE
+				out.firstO = out.firstO || back.firstO
+			} else {
+				if out.even && !out.odd || !out.even && out.odd {
+					out.firstE = back.even
+					out.firstO = back.odd
+				} else {
+					out.firstE = false
+					out.firstO = false
+				}
+			}
+		} else {
+			out.firstE = out.firstE || back.firstE
+			out.firstO = out.firstO || back.firstO
+		}
+	}
+	//fmt.Println(depth-1, out)
 	return
 }
 
@@ -51,6 +79,7 @@ func main() {
 		AOdd = true
 		var sentences map[string]Word
 		sentences = make(map[string]Word)
+		var test Branch
 
 		fmt.Scan(&N, &K)
 		SEven = even(K)
@@ -85,10 +114,25 @@ func main() {
 		//fmt.Println(sentences)
 		if SEven && (AEven || AOdd) {
 			fmt.Println("Rassmo je vychytraly")
+			continue
 		} else if !SEven && AOdd {
 			fmt.Println("Rassmo je vychytraly")
+			continue
 		} else if !SEven && AEven {
 			fmt.Println("Rassmo se priznal")
+			continue
+		}
+		for _, s := range sentences {
+			p := parse(s, 1)
+			test.even = test.even || p.even
+			test.odd = test.odd || p.odd
+			test.firstE = test.firstE || p.firstE
+			test.firstO = test.firstO || p.firstO
+		}
+		if test.even == test.firstE || test.odd == test.firstO {
+			fmt.Println("Rassmo se priznal")
+		} else {
+			fmt.Println("Rassmo je vychytraly")
 		}
 	}
 }
