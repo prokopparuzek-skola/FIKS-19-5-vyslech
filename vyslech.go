@@ -130,7 +130,7 @@ func main() {
 			test.firstE = test.firstE || p.firstE
 			test.firstO = test.firstO || p.firstO
 		}
-		if test.even == test.firstE || test.odd == test.firstO {
+		if test.even == test.firstE && test.odd == test.firstO {
 			fmt.Println("Rassmo se priznal")
 		} else {
 			fmt.Println("Rassmo je vychytraly")
