@@ -32,9 +32,7 @@ func parse(word Word, depth int) (out Branch) {
 	if word.end {
 		if even(depth) {
 			out.even = true
-			if len(word.next) == 0 {
-				out.firstE = true
-			}
+			out.firstE = true
 		} else {
 			out.odd = true
 			if len(word.next) == 0 {
@@ -43,6 +41,7 @@ func parse(word Word, depth int) (out Branch) {
 		}
 	}
 	depth++
+	var test bool = false
 	for _, w := range word.next {
 		back = parse(w, depth)
 		out.even = out.even || back.even
@@ -52,18 +51,32 @@ func parse(word Word, depth int) (out Branch) {
 				out.firstE = out.firstE || back.firstE
 				out.firstO = out.firstO || back.firstO
 			} else {
-				if out.even && !out.odd || !out.even && out.odd {
-					out.firstE = back.even
-					out.firstO = back.odd
+				if back.even && !back.odd {
+					out.firstE = true
+				} else if !back.even && back.odd {
+					out.firstO = true
+				} else if back.firstO && back.firstE && !word.end {
+					out.firstE = true
+					out.firstO = true
 				} else {
 					out.firstE = false
 					out.firstO = false
+					test = true
+				}
+				if back.even && !back.odd && out.odd {
+					test = true
+				} else if !back.even && back.odd && out.even {
+					test = true
 				}
 			}
 		} else {
 			out.firstE = out.firstE || back.firstE
 			out.firstO = out.firstO || back.firstO
 		}
+	}
+	if test {
+		out.firstE = false
+		out.firstO = false
 	}
 	//fmt.Println(depth-1, out)
 	return
@@ -125,12 +138,13 @@ func main() {
 		}
 		for _, s := range sentences {
 			p := parse(s, 1)
+			//fmt.Println(p)
 			test.even = test.even || p.even
 			test.odd = test.odd || p.odd
 			test.firstE = test.firstE || p.firstE
 			test.firstO = test.firstO || p.firstO
 		}
-		if test.even == test.firstE && test.odd == test.firstO {
+		if test.firstE && test.firstO {
 			fmt.Println("Rassmo se priznal")
 		} else {
 			fmt.Println("Rassmo je vychytraly")
